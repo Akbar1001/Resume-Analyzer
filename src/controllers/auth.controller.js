@@ -1,4 +1,6 @@
- const userModel=require("../models/user.model");
+const userModel=require("../models/user.model");
+const bcrypt=require("bcryptjs");
+const jwt=require("jsonwebtoken");
 
 
 /**
@@ -26,6 +28,34 @@
         })
     }
 
- }
+    const hash= await bcrypt.hash(password,10);
+
+    const user= new userModel.create({
+        username,
+        email,
+        password : hash
+    })
+
+    const token= jwt.sign({id:user._id,username:user.username},process.env.JWT_SECRET,{expiresIn:"1d"})
+
+    res.status(201).json({
+        message:"User Created successfully",
+        user:{
+            id:user._id,
+            username:user.username,
+            email:user.email
+        }
+    })
+}
+
+ /**
+ * @name LoginController
+ * @description Login an existing user, expects email and password in the request
+ * @access Public
+ */
+
+ async function LoginController(req,res) {
+    
+ }  
 
  module.exports={registerUserController};
