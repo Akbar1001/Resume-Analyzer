@@ -110,7 +110,28 @@ const tokenblacklistModel=require("../models/blacklist.model");
     res.status(200).json({
         message:"User Logged out successfully"
     })
+ }
+
+ /**
+ * @name getMeController
+ * @description Gives the details of current logged in user
+ * @access Private
+ */
+ async function getMeController(req,res){
+    //the logic for checking the validity of token and its presence in blacklist is handled by middleware
+    // in req we receive a user property so we find the user by its id
+
+    const user= await userModel.findById(req.user.id);
+
+    return res.status(200).json({
+        message:"User's details fetched successfully",
+        user:{
+            id:user._id,
+            username: user.username,
+            email:user.email
+        }
+    })
 
  }
 
- module.exports={registerUserController,LoginController,LogoutController}; 
+ module.exports={registerUserController,LoginController,LogoutController,getMeController}; 

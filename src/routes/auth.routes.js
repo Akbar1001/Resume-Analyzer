@@ -3,6 +3,7 @@ const { route } = require("../app");
 
 const authRouter=express.Router();
 const authControllers=require("../controllers/auth.controller");
+const authmiddleware=require("../middleware/auth.middleware");
 
 /**
  * @route POST /api/auth/register
@@ -26,8 +27,11 @@ authRouter.post("/login",authControllers.LoginController);
 authRouter.get("/logout",authControllers.LogoutController);
 
 /**
- * @route GET /api/auth/logout
- * @description Logout user with tokenblacklisting
- * @access Public
+ * @route GET /api/auth/get-me
+ * @description Gives the details of current logged in user
+ * @access Private
  */
+authRouter.get("/get-me",authmiddleware.authUser,authControllers.getMeController);
+
+
 module.exports=authRouter;
