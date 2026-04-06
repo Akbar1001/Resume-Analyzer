@@ -1,13 +1,15 @@
 import { getAllInterviewReports, generateInterviewReport, getInterviewReportById, generateResumePdf } from "../services/interview.api"
-import { useContext, useEffect } from "react"
-import { InterviewContext } from "../interview.context"
+import { useCallback, useContext, useEffect } from "react"
+import { InterviewContext } from "../interview.context.js"
 import { useParams } from "react-router"
+import { useAuth } from "../../auth/hooks/useAuth"
 
 
 export const useInterview = () => {
 
     const context = useContext(InterviewContext)
     const { interviewId } = useParams()
+    const { user } = useAuth()
 
     if (!context) {
         throw new Error("useInterview must be used within an InterviewProvider")
@@ -20,44 +22,47 @@ export const useInterview = () => {
         let response = null
         try {
             response = await generateInterviewReport({ jobDescription, selfDescription, resumeFile })
-            setReport(response.interviewReport)
+            setReport(response?.interviewReport ?? null)
+            return response?.interviewReport ?? null
         } catch (error) {
             console.log(error)
+            throw error
         } finally {
             setLoading(false)
         }
-
-        return response.interviewReport
     }
 
-    const getReportById = async (interviewId) => {
+    const getReportById = useCallback(async (interviewId) => {
         setLoading(true)
         let response = null
         try {
             response = await getInterviewReportById(interviewId)
-            setReport(response.interviewReport)
+            setReport(response?.interviewReport ?? null)
+            return response?.interviewReport ?? null
         } catch (error) {
             console.log(error)
+            setReport(null)
+            throw error
         } finally {
             setLoading(false)
         }
-        return response.interviewReport
-    }
+    }, [ setLoading, setReport ])
 
-    const getReports = async () => {
+    const getReports = useCallback(async () => {
         setLoading(true)
         let response = null
         try {
             response = await getAllInterviewReports()
-            setReports(response.interviewReports)
+            setReports(response?.interviewReports ?? [])
+            return response?.interviewReports ?? []
         } catch (error) {
             console.log(error)
+            setReports([])
+            throw error
         } finally {
             setLoading(false)
         }
-
-        return response.interviewReports
-    }
+    }, [ setLoading, setReports ])
 
     const getResumePdf = async (interviewReportId) => {
         setLoading(true)
@@ -81,10 +86,10 @@ export const useInterview = () => {
     useEffect(() => {
         if (interviewId) {
             getReportById(interviewId)
-        } else {
+        } else if (user) {
             getReports()
         }
-    }, [ interviewId ])
+    }, [ interviewId, user, getReportById, getReports ])
 
     return { loading, report, reports, generateReport, getReportById, getReports, getResumePdf }
 

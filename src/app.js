@@ -3,11 +3,33 @@ const cookieParser = require("cookie-parser")
 const cors = require("cors")
 
 const app = express()
+const frontendOrigin = process.env.FRONTEND_URL || "http://localhost:5173"
 
 app.use(express.json())
 app.use(cookieParser())
+const allowedOrigins = new Set([
+    frontendOrigin,
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+])
+
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: (origin, callback) => {
+        // Allow non-browser requests (curl, server-to-server) with no Origin header
+        if (!origin) return callback(null, true)
+
+        const isLocalhostVite =
+            /^http:\/\/localhost:\d+$/.test(origin) ||
+            /^http:\/\/127\.0\.0\.1:\d+$/.test(origin)
+
+        if (allowedOrigins.has(origin) || isLocalhostVite) {
+            return callback(null, true)
+        }
+
+        return callback(new Error("Not allowed by CORS"))
+    },
     credentials: true
 }))
 

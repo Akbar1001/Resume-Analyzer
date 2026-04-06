@@ -1,20 +1,32 @@
-import React,{useState} from 'react'
+import React,{useEffect, useState} from 'react'
 import { useNavigate, Link } from 'react-router'
 import "../auth.form.scss"
 import { useAuth } from '../hooks/useAuth'
 
 const Login = () => {
 
-    const { loading, handleLogin } = useAuth()
+    const { loading, user, handleLogin } = useAuth()
     const navigate = useNavigate()
 
     const [ email, setEmail ] = useState("")
     const [ password, setPassword ] = useState("")
+    const [ error, setError ] = useState("")
+
+    useEffect(() => {
+        if (user) {
+            navigate("/", { replace: true })
+        }
+    }, [ user, navigate ])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        await handleLogin({email,password})
-        navigate('/')
+        setError("")
+        try {
+            await handleLogin({email,password})
+            navigate('/', { replace: true })
+        } catch (err) {
+            setError(err?.response?.data?.message || "Login failed. Please try again.")
+        }
     }
 
     if(loading){
@@ -41,6 +53,7 @@ const Login = () => {
                     </div>
                     <button className='button primary-button' >Login</button>
                 </form>
+                {error && <p style={{ color: "crimson" }}>{error}</p>}
                 <p>Don't have an account? <Link to={"/register"} >Register</Link> </p>
             </div>
         </main>

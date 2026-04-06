@@ -5,12 +5,15 @@ const upload=require("../middleware/file.middleware")
 
 const interviewRouter=express.Router();
 
-/**
- * @route - POST/api/interview
- * @description - generates new interview report on the basis of user self description, resume pdf and job description
- * @access - Private
- */
+// Middleware to parse resume uploads
 interviewRouter.post("/",authmiddleware.authUser,upload.single("resume"), interviewController.generateInterviewReportController)
 
+// Specific routes (must come before generic GET /)
+interviewRouter.get("/report/:interviewId", authmiddleware.authUser, interviewController.getInterviewReportByIdController)
+
+interviewRouter.post("/resume/pdf/:interviewReportId", authmiddleware.authUser, interviewController.generateResumePdfController)
+
+// Generic routes (must come after specific routes)
+interviewRouter.get("/", authmiddleware.authUser, interviewController.getAllInterviewReportsController)
 
 module.exports=interviewRouter;

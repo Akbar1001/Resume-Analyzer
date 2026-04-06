@@ -1,21 +1,56 @@
 import React, { useState, useRef } from 'react'
 import "../style/home.scss"
 import { useInterview } from '../hooks/useInterview.js'
+import { useAuth } from '../../../features/auth/hooks/useAuth'
 import { useNavigate } from 'react-router'
 
 const Home = () => {
 
     const { loading, generateReport,reports } = useInterview()
+    const { user } = useAuth()
     const [ jobDescription, setJobDescription ] = useState("")
     const [ selfDescription, setSelfDescription ] = useState("")
+    const [ error, setError ] = useState("")
+    const [ success, setSuccess ] = useState("")
     const resumeInputRef = useRef()
 
     const navigate = useNavigate()
 
     const handleGenerateReport = async () => {
-        const resumeFile = resumeInputRef.current.files[ 0 ]
-        const data = await generateReport({ jobDescription, selfDescription, resumeFile })
-        navigate(`/interview/${data._id}`)
+        setError("")
+        setSuccess("")
+        
+        if (!user) {
+            navigate('/login')
+            return
+        }
+
+        // Validation
+        if (!jobDescription.trim()) {
+            setError("Please provide a job description")
+            return
+        }
+
+        const resumeFile = resumeInputRef.current?.files?.[0]
+        if (!resumeFile && !selfDescription.trim()) {
+            setError("Please provide either a resume or self description")
+            return
+        }
+
+        try {
+            const data = await generateReport({ jobDescription, selfDescription, resumeFile })
+            if (!data || !data._id) {
+                setError("Failed to generate report. Please try again.")
+                return
+            }
+            setSuccess("Interview strategy generated successfully!")
+            setTimeout(() => {
+                navigate(`/interview/${data._id}`)
+            }, 1000)
+        } catch (err) {
+            console.error("Error generating report:", err)
+            setError(err?.response?.data?.message || "Failed to generate interview strategy. Please try again.")
+        }
     }
 
     if (loading) {
@@ -54,7 +89,7 @@ const Home = () => {
                             placeholder={`Paste the full job description here...\ne.g. 'Senior Frontend Engineer at Google requires proficiency in React, TypeScript, and large-scale system design...'`}
                             maxLength={5000}
                         />
-                        <div className='char-counter'>0 / 5000 chars</div>
+                        <div className='char-counter'>{jobDescription.length} / 5000 chars</div>
                     </div>
 
                     {/* Vertical Divider */}
@@ -115,15 +150,44 @@ const Home = () => {
                     <span className='footer-info'>AI-Powered Strategy Generation &bull; Approx 30s</span>
                     <button
                         onClick={handleGenerateReport}
+                        disabled={loading}
                         className='generate-btn'>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" /></svg>
-                        Generate My Interview Strategy
+                        {loading ? "Generating..." : "Generate My Interview Strategy"}
                     </button>
                 </div>
+
+                {/* Error Message */}
+                {error && (
+                    <div style={{
+                        marginTop: "1rem",
+                        padding: "0.75rem 1rem",
+                        background: "#ff2d78",
+                        color: "white",
+                        borderRadius: "0.5rem",
+                        textAlign: "center"
+                    }}>
+                        {error}
+                    </div>
+                )}
+
+                {/* Success Message */}
+                {success && (
+                    <div style={{
+                        marginTop: "1rem",
+                        padding: "0.75rem 1rem",
+                        background: "#28a745",
+                        color: "white",
+                        borderRadius: "0.5rem",
+                        textAlign: "center"
+                    }}>
+                        {success}
+                    </div>
+                )}
             </div>
 
             {/* Recent Reports List */}
-            {reports.length > 0 && (
+            {user && reports.length > 0 && (
                 <section className='recent-reports'>
                     <h2>My Recent Interview Plans</h2>
                     <ul className='reports-list'>

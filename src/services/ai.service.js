@@ -6,6 +6,7 @@ const puppeteer = require("puppeteer")
 const ai = new GoogleGenAI({
     apiKey: process.env.GOOGLE_GENAI_API_KEY
 })
+const geminiModel = process.env.GEMINI_MODEL || "gemini-2.5-flash"
 
 
 const interviewReportSchema = z.object({
@@ -34,25 +35,103 @@ const interviewReportSchema = z.object({
 
 async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
 
+    try {
+        console.log("AI Service: Starting interview report generation");
+        console.log("Resume length:", resume?.length || 0);
+        console.log("Job Description length:", jobDescription?.length || 0);
+        console.log("Self Description length:", selfDescription?.length || 0);
 
-    const prompt = `Generate an interview report for a candidate with the following details:
-                        Resume: ${resume}
-                        Self Description: ${selfDescription}
-                        Job Description: ${jobDescription}
-`
+        const prompt = `You are an expert interview coach. Generate a comprehensive interview report for a candidate in valid JSON format with these exact fields and structure:
 
-    const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: prompt,
-        config: {
-            responseMimeType: "application/json",
-            responseSchema: zodToJsonSchema(interviewReportSchema),
+{
+  "matchScore": <number 0-100>,
+  "title": "<job title>",
+  "technicalQuestions": [
+    {
+      "question": "<question text>",
+      "intention": "<why this question is asked>",
+      "answer": "<how to answer>"
+    }
+  ],
+  "behavioralQuestions": [
+    {
+      "question": "<question text>",
+      "intention": "<why this question is asked>",
+      "answer": "<how to answer>"
+    }
+  ],
+  "skillGaps": [
+    {
+      "skill": "<skill name>",
+      "severity": "low|medium|high"
+    }
+  ],
+  "preparationPlan": [
+    {
+      "day": <number>,
+      "focus": "<focus area>",
+      "tasks": ["<task1>", "<task2>"]
+    }
+  ]
+}
+
+Candidate Details:
+Resume: ${resume || "Not provided"}
+Self Description: ${selfDescription || "Not provided"}
+Job Description: ${jobDescription}
+
+Generate 3-5 technical questions, 2-3 behavioral questions, 3-5 relevant skill gaps, and a 5-day preparation plan. Respond ONLY with valid JSON, no other text.`;
+
+        console.log("AI Service: Sending request to Gemini API");
+        
+        const response = await ai.models.generateContent({
+            model: geminiModel,
+            contents: prompt
+        })
+
+        console.log("AI Service: Response received from Gemini API");
+        console.log("Raw response:", response.text);
+        
+        // Parse the response - it should be JSON
+        let result;
+        try {
+            result = JSON.parse(response.text);
+        } catch (parseError) {
+            console.error("Failed to parse response as JSON:", parseError);
+            // Try to extract JSON from the response
+            const jsonMatch = response.text.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                result = JSON.parse(jsonMatch[0]);
+            } else {
+                throw new Error("Could not extract valid JSON from API response");
+            }
         }
-    })
+        
+        console.log("AI Service: Response parsed successfully");
+        
+        // Validate required fields
+        const requiredFields = ['matchScore', 'title', 'technicalQuestions', 'behavioralQuestions', 'skillGaps', 'preparationPlan'];
+        for (const field of requiredFields) {
+            if (!result[field]) {
+                console.warn(`Warning: Missing field "${field}" in AI response`);
+                // Set default values for missing fields
+                if (field === 'matchScore') result[field] = 0;
+                if (field === 'title') result[field] = 'Interview Report';
+                if (field === 'technicalQuestions') result[field] = [];
+                if (field === 'behavioralQuestions') result[field] = [];
+                if (field === 'skillGaps') result[field] = [];
+                if (field === 'preparationPlan') result[field] = [];
+            }
+        }
+        
+        console.log("AI Service: Returning formatted response");
+        return result
 
-    return JSON.parse(response.text)
-
-
+    } catch(error) {
+        console.error("AI Service Error:", error);
+        console.error("Error details:", error.message || error);
+        throw error;
+    }
 }
 
 
@@ -96,7 +175,7 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
                     `
 
     const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: geminiModel,
         contents: prompt,
         config: {
             responseMimeType: "application/json",
