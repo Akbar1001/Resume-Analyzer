@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from 'react'
-import { useNavigate, Link } from 'react-router'
+import { useNavigate, Link, useLocation } from 'react-router'
 import "../auth.form.scss"
 import { useAuth } from '../hooks/useAuth'
 
@@ -7,23 +7,35 @@ const Login = () => {
 
     const { loading, user, handleLogin } = useAuth()
     const navigate = useNavigate()
+    const location = useLocation()
 
     const [ email, setEmail ] = useState("")
     const [ password, setPassword ] = useState("")
     const [ error, setError ] = useState("")
+    const returnTo = location.state?.returnTo || "/"
+    const shouldRestoreGenerationDraft = Boolean(location.state?.restoreGenerationDraft)
+    const loginHint = location.state?.reason === "login_required_for_generation"
+        ? (location.state?.message || "Please login to continue.")
+        : ""
 
     useEffect(() => {
         if (user) {
-            navigate("/", { replace: true })
+            navigate(returnTo, {
+                replace: true,
+                state: shouldRestoreGenerationDraft ? { restoreGenerationDraft: true } : null
+            })
         }
-    }, [ user, navigate ])
+    }, [ user, navigate, returnTo, shouldRestoreGenerationDraft ])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         setError("")
         try {
             await handleLogin({email,password})
-            navigate('/', { replace: true })
+            navigate(returnTo, {
+                replace: true,
+                state: shouldRestoreGenerationDraft ? { restoreGenerationDraft: true } : null
+            })
         } catch (err) {
             setError(err?.response?.data?.message || "Login failed. Please try again.")
         }
@@ -38,6 +50,7 @@ const Login = () => {
         <main>
             <div className="form-container">
                 <h1>Login</h1>
+                {loginHint && <p style={{ color: "#555" }}>{loginHint}</p>}
                 <form onSubmit={handleSubmit}>
                     <div className="input-group">
                         <label htmlFor="email">Email</label>

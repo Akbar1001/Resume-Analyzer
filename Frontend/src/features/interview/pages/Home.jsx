@@ -1,13 +1,15 @@
-import React, { useState, useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import "../style/home.scss"
 import { useInterview } from '../hooks/useInterview.js'
 import { useAuth } from '../../../features/auth/hooks/useAuth'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
+
+const GENERATION_DRAFT_KEY = "generationDraft"
 
 const Home = () => {
 
-    const { loading, generateReport,reports } = useInterview()
-    const { user } = useAuth()
+    const { loading, generateReport } = useInterview()
+    const { user, refreshUser } = useAuth()
     const [ jobDescription, setJobDescription ] = useState("")
     const [ selfDescription, setSelfDescription ] = useState("")
     const [ error, setError ] = useState("")
@@ -15,13 +17,47 @@ const Home = () => {
     const resumeInputRef = useRef()
 
     const navigate = useNavigate()
+    const location = useLocation()
+
+    useEffect(() => {
+        const fromState = location.state?.restoreGenerationDraft
+        const rawDraft = sessionStorage.getItem(GENERATION_DRAFT_KEY)
+        if (!fromState || !rawDraft) return
+
+        try {
+            const draft = JSON.parse(rawDraft)
+            setJobDescription(draft.jobDescription || "")
+            setSelfDescription(draft.selfDescription || "")
+        } catch (e) {
+            console.error("Could not restore generation draft", e)
+        } finally {
+            sessionStorage.removeItem(GENERATION_DRAFT_KEY)
+            navigate(location.pathname, { replace: true, state: null })
+        }
+    }, [ location.state, location.pathname, navigate ])
 
     const handleGenerateReport = async () => {
         setError("")
         setSuccess("")
-        
-        if (!user) {
-            navigate('/login')
+
+        let authenticatedUser = user
+        if (!authenticatedUser) {
+            authenticatedUser = await refreshUser()
+        }
+
+        if (!authenticatedUser) {
+            sessionStorage.setItem(GENERATION_DRAFT_KEY, JSON.stringify({
+                jobDescription,
+                selfDescription
+            }))
+            navigate('/login', {
+                state: {
+                    reason: "login_required_for_generation",
+                    message: "Please login to generate your interview strategy.",
+                    returnTo: "/",
+                    restoreGenerationDraft: true
+                }
+            })
             return
         }
 
@@ -84,6 +120,7 @@ const Home = () => {
                             <span className='badge badge--required'>Required</span>
                         </div>
                         <textarea
+                            value={jobDescription}
                             onChange={(e) => { setJobDescription(e.target.value) }}
                             className='panel__textarea'
                             placeholder={`Paste the full job description here...\ne.g. 'Senior Frontend Engineer at Google requires proficiency in React, TypeScript, and large-scale system design...'`}
@@ -127,6 +164,7 @@ const Home = () => {
                         <div className='self-description'>
                             <label className='section-label' htmlFor='selfDescription'>Quick Self-Description</label>
                             <textarea
+                                value={selfDescription}
                                 onChange={(e) => { setSelfDescription(e.target.value) }}
                                 id='selfDescription'
                                 name='selfDescription'
@@ -185,22 +223,6 @@ const Home = () => {
                     </div>
                 )}
             </div>
-
-            {/* Recent Reports List */}
-            {user && reports.length > 0 && (
-                <section className='recent-reports'>
-                    <h2>My Recent Interview Plans</h2>
-                    <ul className='reports-list'>
-                        {reports.map(report => (
-                            <li key={report._id} className='report-item' onClick={() => navigate(`/interview/${report._id}`)}>
-                                <h3>{report.title || 'Untitled Position'}</h3>
-                                <p className='report-meta'>Generated on {new Date(report.createdAt).toLocaleDateString()}</p>
-                                <p className={`match-score ${report.matchScore >= 80 ? 'score--high' : report.matchScore >= 60 ? 'score--mid' : 'score--low'}`}>Match Score: {report.matchScore}%</p>
-                            </li>
-                        ))}
-                    </ul>
-                </section>
-            )}
 
             {/* Page Footer */}
             <footer className='page-footer'>
