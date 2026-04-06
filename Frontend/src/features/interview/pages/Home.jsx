@@ -85,7 +85,9 @@ const Home = () => {
             }, 1000)
         } catch (err) {
             console.error("Error generating report:", err)
-            setError(err?.response?.data?.message || "Failed to generate interview strategy. Please try again.")
+            const errorMessage = err?.response?.data?.message || err?.message || "Failed to generate interview strategy. Please try again."
+            console.error("Error message:", errorMessage)
+            setError(errorMessage)
         }
     }
 

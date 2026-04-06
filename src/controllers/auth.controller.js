@@ -41,10 +41,14 @@ const tokenblacklistModel=require("../models/blacklist.model");
     res.cookie("token",token);
     res.status(201).json({
         message:"User Created successfully",
-        user:{
-            id:user._id,
-            username:user.username,
-            email:user.email
+        token: token,
+        data: {
+            user:{
+                id:user._id,
+                username:user.username,
+                email:user.email
+            },
+            token: token
         }
     })
 }
@@ -83,11 +87,15 @@ const tokenblacklistModel=require("../models/blacklist.model");
     res.cookie("token",token);
     return res.status(200).json({
         message:"User LoggedIn Successfully",
-        user:{
-            id:user._id,
-            username:user.username,
-            email:user.email
-        } 
+        token: token,
+        data: {
+            user:{
+                id:user._id,
+                username:user.username,
+                email:user.email
+            },
+            token: token
+        }
     })
 
  }  

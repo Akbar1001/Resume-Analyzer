@@ -6,7 +6,8 @@ const puppeteer = require("puppeteer")
 const ai = new GoogleGenAI({
     apiKey: process.env.GOOGLE_GENAI_API_KEY
 })
-const geminiModel = process.env.GEMINI_MODEL || "gemini-2.5-flash"
+
+const geminiModel = "models/gemini-2.5-flash"
 
 
 const interviewReportSchema = z.object({
@@ -92,14 +93,21 @@ Generate 3-5 technical questions, 2-3 behavioral questions, 3-5 relevant skill g
         console.log("AI Service: Response received from Gemini API");
         console.log("Raw response:", response.text);
         
+        // Strip markdown code block formatting if present
+        let responseText = response.text.trim();
+        if (responseText.startsWith('```')) {
+            // Remove markdown code block wrapper: ```json ... ```
+            responseText = responseText.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```$/, '');
+        }
+        
         // Parse the response - it should be JSON
         let result;
         try {
-            result = JSON.parse(response.text);
+            result = JSON.parse(responseText);
         } catch (parseError) {
             console.error("Failed to parse response as JSON:", parseError);
             // Try to extract JSON from the response
-            const jsonMatch = response.text.match(/\{[\s\S]*\}/);
+            const jsonMatch = responseText.match(/\{[\s\S]*\}/);
             if (jsonMatch) {
                 result = JSON.parse(jsonMatch[0]);
             } else {
@@ -183,8 +191,14 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
         }
     })
 
+    // Strip markdown code block formatting if present
+    let responseText = response.text.trim();
+    if (responseText.startsWith('```')) {
+        // Remove markdown code block wrapper: ```json ... ```
+        responseText = responseText.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```$/, '');
+    }
 
-    const jsonContent = JSON.parse(response.text)
+    const jsonContent = JSON.parse(responseText)
 
     const pdfBuffer = await generatePdfFromHtml(jsonContent.html)
 
