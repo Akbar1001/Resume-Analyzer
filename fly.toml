@@ -1,0 +1,41 @@
+# Fly.io configuration for Resume Analyzer
+
+app = "resume-analyzer"
+
+# Primary region - sjc is US West, change if needed
+# Available regions: sjc (US/West), iad (US/East), lhr (UK), cdg (France), etc.
+primary_region = "sjc"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[processes]
+  app = "npm start"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 3000
+  processes = ["app"]
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+  
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+
+  [services.http_checks]
+    enabled = true
+    uri = "/api/auth/get-me"
+    interval = 10000
+    timeout = 5000
+    grace_period = "30s"
+
+# Pricing: Free tier = 3 shared-cpu-1x 256MB VMs
+# This config uses 1 VM, well within free tier
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256
