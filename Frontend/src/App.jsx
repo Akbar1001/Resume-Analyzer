@@ -9,7 +9,7 @@ function App() {
     <AuthProvider>
       <InterviewProvider>
         <RouterProvider router={router} />
-      </InterviewProvider> 
+      </InterviewProvider>
     </AuthProvider>
   )
 }

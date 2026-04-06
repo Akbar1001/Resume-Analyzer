@@ -1,63 +1,66 @@
-/* this is the code for api layer which helps in communication b/w the backend api and frontend */
-
 import axios from "axios"
 
-//creating an instance of axios for repetetive code
-const api= axios.create({
-    baseURL:"http://localhost:3000",
-    withCredentials:true
+
+const api = axios.create({
+    baseURL: "http://localhost:3000",
+    withCredentials: true
 })
 
-export async function register({username,email,password}){
-    try{
-        const responce = await api.post("/api/auth/register",{
-            username,email,password
+export async function register({ username, email, password }) {
+
+    try {
+        const response = await api.post('/api/auth/register', {
+            username, email, password
         })
 
-        return responce.data;
+        return response.data
+
+    } catch (err) {
+
+        console.log(err)
+
     }
-    catch(err){
-        console.log(err);
-    }
+
 }
 
+export async function login({ email, password }) {
 
-export async function login({email,password}) {
-    try{
-        const response = await api.post("/api/auth/login",{
-            email,password
+    try {
+
+        const response = await api.post("/api/auth/login", {
+            email, password
         })
 
-        return response.data;
+        return response.data
 
-    }catch(err){
-        console.log(err);
-        
+    } catch (err) {
+        console.log(err)
     }
+
 }
 
-export async function logout(){
-
-    try{
+export async function logout() {
+    try {
 
         const response = await api.get("/api/auth/logout")
 
-        return response.data;
-    }catch(err){
+        return response.data
+
+    } catch (err) {
         console.log(err);
-        
     }
 }
 
 export async function getMe() {
 
-    try{
-        const response= await api.get("/api/auth/get-me")
-        
-        return response.data; 
+    try {
 
-    }catch(err){
-        console.log(err);
+        const response = await api.get("/api/auth/get-me")
+
+        return response.data
+
+    } catch (err) {
+        console.log(err)
     }
-    
+
 }
