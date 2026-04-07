@@ -108,21 +108,6 @@ Visit: http://localhost:5173
 - `GET /api/interview/report/:interviewId` - Get specific report
 - `POST /api/interview/resume/pdf/:interviewReportId` - Generate resume PDF
 
-## Environment Variables
-
-### Backend (.env)
-```
-MONGO_URI=mongodb+srv://user:pass@cluster.mongodb.net/database
-JWT_SECRET=your_very_secret_key_here
-GOOGLE_GENAI_API_KEY=AIzaSy...
-NODE_ENV=development
-PORT=3000
-```
-
-### Frontend (.env or .env.local)
-```
-VITE_API_URL=http://localhost:3000
-```
 
 ## Deployment
 
@@ -239,4 +224,3 @@ Issues? Questions?
 - ⚡ **Response Time**: <5 seconds for report generation
 - 🔒 **Security**: JWT, bcrypt, CORS
 
-**Ready to deploy? → See [DEPLOYMENT.md](./DEPLOYMENT.md)**
