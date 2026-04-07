@@ -68,11 +68,15 @@ fly launch
 
 **6. Add Environment Variables**
 ```bash
-fly secrets set MONGO_URI="mongodb+srv://akbarcode20_db_user:reeftVyRaO8GuBis@ra-cluster.pxfbbyr.mongodb.net/RA"
-fly secrets set JWT_SECRET="131e369148e8cbede40662f12edc62dd2cc756863e8aa6f03ae1c22e969100cc"
-fly secrets set GOOGLE_GENAI_API_KEY="AIzaSyC7kyH7J08mXVJGjiPxXiTCmX5qmTz2kug"
+fly secrets set MONGO_URI="mongodb+srv://your_username:your_password@your_cluster.mongodb.net/RA"
+fly secrets set JWT_SECRET="your_jwt_secret_key_here"
+fly secrets set GOOGLE_GENAI_API_KEY="your_google_gemini_api_key_here"
 fly secrets set NODE_ENV="production"
 ```
+
+**⚠️ IMPORTANT SECURITY NOTE:**
+Never share your actual credentials. Always use placeholder values in documentation.
+Set your real credentials only in the hosting platform's secure console.
 
 **7. Deploy**
 ```bash
@@ -268,10 +272,12 @@ fly launch
 # Skip Postgres and Redis
 
 # Set secrets
-fly secrets set MONGO_URI="mongodb+srv://akbarcode20_db_user:reeftVyRaO8GuBis@ra-cluster.pxfbbyr.mongodb.net/RA"
-fly secrets set JWT_SECRET="131e369148e8cbede40662f12edc62dd2cc756863e8aa6f03ae1c22e969100cc"  
-fly secrets set GOOGLE_GENAI_API_KEY="AIzaSyC7kyH7J08mXVJGjiPxXiTCmX5qmTz2kug"
+fly secrets set MONGO_URI="mongodb+srv://your_username:your_password@your_cluster.mongodb.net/RA"
+fly secrets set JWT_SECRET="your_jwt_secret_key_here"  
+fly secrets set GOOGLE_GENAI_API_KEY="your_google_gemini_api_key_here"
 fly secrets set NODE_ENV="production"
+
+# ⚠️ IMPORTANT: Use your actual API keys in the commands above, not these placeholders!
 
 # Deploy
 fly deploy

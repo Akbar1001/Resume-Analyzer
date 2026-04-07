@@ -102,13 +102,16 @@ VITE_API_URL=http://localhost:3000  # Change this once backend is deployed
 # 3. Select "Resume-Analyzer"
 # 4. Configure variables by adding to Railway dashboard:
 
-MONGO_URI=mongodb+srv://user:password@cluster.mongodb.net/RA
-JWT_SECRET=your_secret_key_here
-GOOGLE_GENAI_API_KEY=AIzaSyC7kyH...
+MONGO_URI=mongodb+srv://your_username:your_password@your_cluster.mongodb.net/RA
+JWT_SECRET=your_jwt_secret_key_here
+GOOGLE_GENAI_API_KEY=your_google_gemini_api_key_here
 NODE_ENV=production
 
 # 5. Railway auto-deploys when you push to GitHub
 # 6. Your backend URL will be: https://resume-analyzer-production.up.railway.app
+
+# IMPORTANT: Never share or commit your actual API keys to GitHub!
+# Use the hosting platform's secure config panel to set these values.
 ```
 
 ---
@@ -122,12 +125,18 @@ VITE_API_URL=https://your-backend-url.com
 
 ### Backend (.env or hosting dashboard)
 ```
-MONGO_URI=mongodb+srv://akbarcode20_db_user:reeftVyRaO8GuBis@ra-cluster.pxfbbyr.mongodb.net/RA
-JWT_SECRET=131e369148e8cbede40662f12edc62dd2cc756863e8aa6f03ae1c22e969100cc
-GOOGLE_GENAI_API_KEY=AIzaSyC7kyH7J08mXVJGjiPxXiTCmX5qmTz2kug
+MONGO_URI=mongodb+srv://your_username:your_password@your_cluster.mongodb.net/RA
+JWT_SECRET=your_jwt_secret_key_here
+GOOGLE_GENAI_API_KEY=your_google_gemini_api_key_here
 NODE_ENV=production
 PORT=3000
 ```
+
+**Note:** For secure credential management:
+1. Never commit your .env file to Git
+2. Use `.env.example` as a template
+3. Set environment variables directly in your hosting platform's dashboard
+4. For local development, copy `.env.example` to `.env` and fill in your values
 
 ---
 

@@ -1,36 +1,100 @@
+# Environment Variables - NEVER COMMIT THESE
 .env
 .env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Dependencies
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
 # Build outputs
 dist/
 build/
 .next/
 out/
+Frontend/dist/
 
-# IDE
+# IDE & Editor
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# OS
+*.swn
+*~
 .DS_Store
 Thumbs.db
+*.sublime-project
+*.sublime-workspace
+.vim/
 
-# Test files
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Test files (but keep .example files)
 test-*.js
 test-*.mjs
+!test-*.example.js
+!test-*.example.mjs
 
 # Logs
 logs/
 *.log
+npm-debug.log*
+yarn-debug.log*
 
-# Temporary
+# Temporary files
 temp/
 tmp/
+*.tmp
+*.bak
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.realm
+*.pem
+*.key
+
+# Secret/Key files
+*.pem
+*.pub
+*.pfx
+*.p12
+*.keystore
+.ssh/
+
+# Cache directories
+.cache/
+.npm/
+.eslintcache
+
+# Installation & builds
+dist/
+build/
+coverage/
+.next/
+out/
+
+# Environment specific
+.env
+.env.local
+.env.development
+.env.production
+
+# Dependencies lock - optional to commit (choose one strategy)
+# Uncomment below if you want to commit lock files
+# !package-lock.json
+# !yarn.lock
