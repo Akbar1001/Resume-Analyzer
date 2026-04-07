@@ -63,39 +63,6 @@ git clone https://github.com/Akbar1001/Resume-Analyzer.git
 cd Resume-Analyzer
 ```
 
-### 2. Backend Setup
-```bash
-# Install dependencies
-npm install
-
-# Create .env file
-echo "MONGO_URI=your_mongodb_url" > .env
-echo "JWT_SECRET=your_secret_key" >> .env
-echo "GOOGLE_GENAI_API_KEY=your_gemini_api_key" >> .env
-
-# Start server (runs on port 3000)
-npm start
-```
-
-### 3. Frontend Setup
-```bash
-cd Frontend
-
-# Install dependencies
-npm install
-
-# Start dev server (runs on port 5173+)
-npm run dev
-
-# Build for production
-npm run build
-```
-
-### 4. Open Application
-Visit: http://localhost:5173
-
-## API Endpoints
-
 ### Authentication
 - `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - Login user
@@ -108,20 +75,6 @@ Visit: http://localhost:5173
 - `GET /api/interview/report/:interviewId` - Get specific report
 - `POST /api/interview/resume/pdf/:interviewReportId` - Generate resume PDF
 
-
-## Deployment
-
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment guide with:
-- ✅ Vercel (Frontend)
-- ✅ Railway (Backend)
-- ✅ Alternative providers (Render, Heroku)
-- ✅ Custom domain setup
-
-### Quick Deploy (Vercel + Railway)
-1. Frontend: https://vercel.com → Import GitHub Repo → Select `Resume-Analyzer` → Root: `Frontend`
-2. Backend: https://railway.app → New Project → GitHub Repo → `Resume-Analyzer`
-3. Add environment variables to each platform
-4. Update `VITE_API_URL` in Vercel with Railway backend URL
 
 ## Project Structure
 
@@ -164,20 +117,6 @@ Each generated report includes:
 - **Skill Gaps** with severity levels (low/medium/high)
 - **5-Day Preparation Plan** with daily tasks
 
-## Error Handling
-
-- Form validation with helpful error messages
-- Auth error feedback (invalid credentials, token expired)
-- AI service error recovery with fallbacks
-- PDF parsing errors with alternative methods
-
-## Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
 
 ## Legal & Privacy
 
@@ -187,34 +126,11 @@ Each generated report includes:
 - Google Gemini API handles text analysis
 - Users can delete their accounts and data
 
-## Troubleshooting
 
-### Backend Issues
-- Check MongoDB URI is valid
-- Verify Gemini API key is active
-- Ensure `.env` file exists with all variables
-- Check port 3000 is not in use
-
-### Frontend Issues
-- Clear cache: `npm cache clean --force`
-- Remove `node_modules` and reinstall: `rm -rf node_modules && npm install`
-- Check `VITE_API_URL` points to correct backend
-
-### Deployment Issues
-See [DEPLOYMENT.md](./DEPLOYMENT.md) troubleshooting section
 
 ## License
 
 MIT License - feel free to use this project
-
-## Support
-
-Issues? Questions?
-- Check [DEPLOYMENT.md](./DEPLOYMENT.md) for deployment help
-- Review API endpoints documentation
-- Check environment variables are set correctly
-
----
 
 ## Stats
 
