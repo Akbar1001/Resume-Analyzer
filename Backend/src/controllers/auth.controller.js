@@ -38,7 +38,12 @@ const tokenblacklistModel=require("../models/blacklist.model");
 
     const token= jwt.sign({id:user._id,username:user.username},process.env.JWT_SECRET,{expiresIn:"1d"})
 
-    res.cookie("token",token);
+    res.cookie("token",token,{
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 24*60*60*1000
+    });
     res.status(201).json({
         message:"User Created successfully",
         token: token,
@@ -84,7 +89,12 @@ const tokenblacklistModel=require("../models/blacklist.model");
         {expiresIn:"1d"}
     )
 
-    res.cookie("token",token);
+    res.cookie("token",token,{
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 24*60*60*1000
+    });
     return res.status(200).json({
         message:"User LoggedIn Successfully",
         token: token,
