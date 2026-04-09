@@ -17,21 +17,14 @@ const allowedOrigins = new Set([
 ])
 
 app.use(cors({
-    origin: (origin, callback) => {
-        // Allow non-browser requests (curl, server-to-server) with no Origin header
-        if (!origin) return callback(null, true)
-
-        const isLocalhostVite =
-            /^http:\/\/localhost:\d+$/.test(origin) ||
-            /^http:\/\/127\.0\.0\.1:\d+$/.test(origin)
-
-        if (allowedOrigins.has(origin) || isLocalhostVite) {
-            return callback(null, true)
-        }
-
-        return callback(new Error("Not allowed by CORS"))
-    },
-    credentials: true
+  origin: function(origin, callback) {
+    if (!origin || origin.includes("vercel.app")) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
 }))
 
 /* require all the routes here */
